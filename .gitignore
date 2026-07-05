@@ -2,3 +2,6 @@
 node_modules/
 *.pdf
 .vercel/
+dist/
+node_modules/
+package*.json

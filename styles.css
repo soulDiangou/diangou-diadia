@@ -290,7 +290,7 @@ html[data-theme="dark"] .btn-amber{color:#2b1a02;}
 .speak-fab.big{width:76px;height:76px;font-size:30px;margin:8px auto 16px;box-shadow:var(--glow);}
 
 /* formes d'une lettre */
-.forms-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0 14px;}
+.forms-row{display:flex;flex-direction:row-reverse;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0 14px;}
 .form-box{
   background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
   min-width:72px;padding:10px 12px;text-align:center;
@@ -488,7 +488,8 @@ input.name-input:focus{border-color:var(--acc);box-shadow:var(--glow);}
 }
 .book-card b{display:block;font-size:14px;}
 .book-card span{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
-.btable{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0;}
+/* les grilles de lettres se remplissent de droite à gauche, comme l'écriture arabe */
+.btable{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0;direction:rtl;}
 @media(min-width:560px){.btable{grid-template-columns:repeat(5,1fr);}}
 .bcell{
   background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
@@ -496,7 +497,7 @@ input.name-input:focus{border-color:var(--acc);box-shadow:var(--glow);}
 }
 .bcell:active{transform:scale(.92);}
 .bcell .a{display:block;font-size:28px;line-height:1.5;}
-.bcell small{display:block;font-size:10px;font-weight:800;color:var(--muted);margin-top:2px;}
+.bcell small{display:block;font-size:10px;font-weight:800;color:var(--muted);margin-top:2px;direction:ltr;}
 .btable.forms{grid-template-columns:repeat(4,1fr);}
 .btable.forms .bcell .a{font-size:24px;}
 .bhead{
@@ -515,6 +516,41 @@ input.name-input:focus{border-color:var(--acc);box-shadow:var(--glow);}
 .rev-row .ar{flex:1;font-size:24px;text-align:right;}
 .rev-row .tr{font-size:12.5px;font-weight:800;color:var(--acc);min-width:86px;}
 .rev-row .tr.hidden-tr{filter:blur(6px);}
+/* livret : mode « masquer le français » — noms et phonétique floutés pour s'auto-tester */
+.step.hide-fr .bcell small{filter:blur(5px);opacity:.5;}
+
+/* ---------- Page de bienvenue (premier lancement) ---------- */
+#welcome-layer{
+  position:fixed;inset:0;z-index:70;display:none;
+  background:var(--bg);overflow-y:auto;
+}
+#welcome-layer.open{display:block;animation:rise .35s ease;}
+.welcome-shell{max-width:520px;margin:0 auto;padding:48px 22px 40px;text-align:center;}
+.welcome-sigil{
+  width:84px;height:84px;margin:0 auto 18px;border-radius:26px;
+  display:grid;place-items:center;font-size:34px;font-weight:700;color:#fff;
+  background:conic-gradient(from 210deg, var(--acc), var(--acc-2), var(--acc));
+  box-shadow:var(--glow);
+}
+.welcome-title{font-family:'Unbounded';font-size:26px;line-height:1.15;}
+.welcome-title em{font-style:normal;color:var(--acc);}
+.welcome-tag{margin-top:8px;font-size:14.5px;font-weight:600;color:var(--muted);line-height:1.5;}
+.welcome-free{
+  display:inline-flex;align-items:center;gap:6px;margin-top:14px;
+  padding:8px 14px;border-radius:99px;font-size:12.5px;font-weight:800;
+  color:var(--ok);background:var(--ok-soft);border:1px solid var(--ok);
+}
+.welcome-feats{margin-top:22px;display:flex;flex-direction:column;gap:10px;text-align:left;}
+.wf{
+  display:flex;gap:12px;align-items:flex-start;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+  padding:12px 14px;backdrop-filter:blur(8px);
+}
+.wf .i{font-size:22px;line-height:1.2;}
+.wf b{display:block;font-size:13.5px;}
+.wf div span{display:block;font-size:12.5px;color:var(--muted);font-weight:600;margin-top:2px;line-height:1.45;}
+.welcome-for{margin:18px 0 14px;font-size:13px;font-weight:700;}
+#welcome-start{font-size:15px;}
 
 @media(prefers-reduced-motion:reduce){
   *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;}

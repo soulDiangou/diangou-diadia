@@ -4,10 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Diangou Diadia — Apprendre l'arabe pas à pas</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- pwa:fonts --><link rel="stylesheet" href="fonts/fonts.css"><!-- /pwa:fonts -->
 <link rel="stylesheet" href="styles.css">
+<!-- pwa:start -->
+<meta name="theme-color" content="#0891B2">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- pwa:end -->
 </head>
 <body>
 <div id="app">
@@ -24,7 +29,7 @@
   </header>
 
   <!-- ===== PARCOURS ===== -->
-  <section class="view active" id="view-home">
+  <section class="view" id="view-home">
     <div class="hero">
       <div class="ar-deco arabic">ا ب ت</div>
       <div class="ring-wrap">
@@ -40,20 +45,20 @@
       </div>
     </div>
 
-    <div class="section-h"><span class="tick"></span><h2>Ton parcours — 10 étapes</h2></div>
+    <div class="section-h"><span class="tick"></span><h2>Ton entraînement — 10 étapes</h2></div>
     <div class="path" id="path"></div>
 
     <div class="footer-credit">Created by <b>@S.B</b> from T.</div>
   </section>
 
   <!-- ===== LIVRET (les 10 leçons du livre de référence) ===== -->
-  <section class="view" id="view-book">
+  <section class="view active" id="view-book">
     <div class="hero">
-      <span class="tag">Le livret de lecture</span>
-      <h1>Les 10 leçons, à consulter 📖</h1>
-      <p>Tout le cours en un seul endroit : l'alphabet complet, les écritures, les voyelles, les allongements... Touche n'importe quelle lettre ou mot pour l'écouter.</p>
+      <span class="tag">Commence ici</span>
+      <h1>Le cours — 10 leçons 📖</h1>
+      <p>Tout le cours en un seul endroit : l'alphabet complet, les écritures, les voyelles, les allongements... Lis les leçons dans l'ordre en touchant les lettres et les mots pour les écouter, puis va t'entraîner dans le <b>Parcours</b>.</p>
     </div>
-    <div class="section-h"><span class="tick"></span><h2>Sommaire</h2></div>
+    <div class="section-h"><span class="tick"></span><h2>Les 10 leçons</h2></div>
     <div id="book-list"></div>
     <div class="footer-credit">Created by <b>@S.B</b> from T.</div>
   </section>
@@ -87,6 +92,15 @@
       <span style="font-size:12.5px;color:var(--muted);font-weight:600;display:block;margin-top:4px;" id="force-desc">Par défaut, chaque étape s'ouvre en validant la précédente (quiz à 80 %).</span>
       <button class="btn btn-ghost btn-sm" id="force-btn" style="margin-top:12px;">🔓 Tout déverrouiller</button>
     </div>
+    <div class="card" style="background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;backdrop-filter:blur(8px);margin-top:12px;">
+      <b style="font-size:14px;display:block;">Ma sauvegarde</b>
+      <span style="font-size:12.5px;color:var(--muted);font-weight:600;display:block;margin-top:4px;">Tes étoiles, badges et étapes validées sont enregistrés sur cet appareil. Garde une copie pour ne rien perdre (changement de téléphone, nettoyage du navigateur…).</span>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" id="export-btn">💾 Sauvegarder</button>
+        <button class="btn btn-ghost btn-sm" id="import-btn">📥 Restaurer</button>
+        <input type="file" id="import-file" accept=".json,application/json" style="display:none;">
+      </div>
+    </div>
     <div class="footer-credit">Created by <b>@S.B</b> from T.</div>
   </section>
 </div>
@@ -103,10 +117,30 @@
   </div>
 </div>
 
+<!-- ===== PAGE DE BIENVENUE (premier lancement) ===== -->
+<div id="welcome-layer">
+  <div class="welcome-shell">
+    <div class="welcome-sigil arabic">دد</div>
+    <h1 class="welcome-title">Diangou <em>Diadia</em></h1>
+    <p class="welcome-tag">Apprends à lire l'arabe pas à pas — même en partant de zéro.</p>
+    <div class="welcome-free">💚 100 % gratuit · sans publicité · sans inscription</div>
+    <div class="welcome-feats">
+      <div class="wf"><span class="i">📖</span><div><b>1 · Le livret, ton cours</b><span>Commence ici : les 10 leçons du livre de référence, de l'alphabet aux premières lectures.</span></div></div>
+      <div class="wf"><span class="i">🗺️</span><div><b>2 · Le parcours, ton entraînement</b><span>Puis entraîne-toi en 10 étapes, avec des quiz, des étoiles et des badges.</span></div></div>
+      <div class="wf"><span class="i">🔊</span><div><b>Tout s'écoute</b><span>Touche n'importe quelle lettre ou n'importe quel mot pour entendre sa prononciation.</span></div></div>
+      <div class="wf"><span class="i">🔁</span><div><b>Une révision maligne</b><span>Ce que tu rates revient te voir jusqu'à ce que ce soit acquis.</span></div></div>
+      <div class="wf"><span class="i">📱</span><div><b>Toujours avec toi</b><span>Fonctionne hors-ligne et s'installe sur ton téléphone comme une appli.</span></div></div>
+    </div>
+    <p class="welcome-for">Pensé pour les débutants complets — enfants comme adultes.</p>
+    <button class="btn btn-primary btn-block" id="welcome-start">🚀 Commencer l'aventure</button>
+    <div class="footer-credit">Created by <b>@S.B</b> from T.</div>
+  </div>
+</div>
+
 <nav class="bottomnav">
   <div class="dock">
-    <button data-nav="home" class="active"><span class="i">🗺️</span>Parcours</button>
-    <button data-nav="book"><span class="i">📖</span>Livret</button>
+    <button data-nav="book" class="active"><span class="i">📖</span>Livret</button>
+    <button data-nav="home"><span class="i">🗺️</span>Parcours</button>
     <button data-nav="review"><span class="i">🔁</span>Réviser</button>
     <button data-nav="progress"><span class="i">📊</span>Progrès</button>
   </div>
@@ -115,5 +149,12 @@
 <div class="toast" id="toast"></div>
 
 <script src="app.js"></script>
+<!-- pwa:start -->
+<script>
+if('serviceWorker' in navigator && location.protocol!=='file:'){
+  addEventListener('load', ()=>navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).catch(()=>{}));
+}
+</script>
+<!-- pwa:end -->
 </body>
 </html>

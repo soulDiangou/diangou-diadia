@@ -163,7 +163,7 @@ const BADGES = [
    ============================================================ */
 const DKEY = 'diangou-diadia-v1';
 const DEFAULT_P = {
-  stars:0, streak:0, last:null, theme:null, name:'', force:false,
+  stars:0, streak:0, last:null, theme:null, name:'', force:false, showFr:false, welcomed:false,
   mods: Array.from({length:10},()=>({done:[], passed:false, best:0})),
   rq:[], reviewCount:0, badges:[]
 };
@@ -185,6 +185,32 @@ function load(){
   save();
 }
 
+/* sauvegarde / restauration de la progression (fichier JSON) */
+function exportProgress(){
+  const payload = {app:'diangou-diadia', version:1, date:new Date().toISOString(), data:P};
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'diangou-diadia-progression-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  toast('💾 Fichier de sauvegarde téléchargé — garde-le précieusement !');
+}
+function importProgress(file){
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    try{
+      const obj = JSON.parse(rd.result);
+      if(obj.app!=='diangou-diadia' || !obj.data || !Array.isArray(obj.data.mods)) throw 0;
+      if(!confirm('Remplacer la progression actuelle par celle du fichier ('+(obj.date||'date inconnue').slice(0,10)+') ?')) return;
+      P = Object.assign(JSON.parse(JSON.stringify(DEFAULT_P)), obj.data);
+      save(); applyTheme(); renderAll();
+      toast('📥 Progression restaurée — content de te revoir !');
+    }catch(e){ toast('❌ Ce fichier n\'est pas une sauvegarde Diangou Diadia.'); }
+  };
+  rd.readAsText(file);
+}
+
 /* ============================================================
    THÈME clair / sombre
    ============================================================ */
@@ -202,14 +228,20 @@ document.getElementById('theme-btn').addEventListener('click', ()=>{
 /* ============================================================
    AUDIO — synthèse vocale arabe
    ============================================================ */
-let voiceAr = null;
+let voiceAr = null, voicesReady = false, audioWarned = false;
 function pickVoice(){
   const vs = speechSynthesis.getVoices();
+  if(vs.length) voicesReady = true;
   voiceAr = vs.find(v=>/^ar/i.test(v.lang)) || null;
 }
 if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 function speak(txt, rate=0.72){
-  if(!('speechSynthesis' in window)) return toast('🔇 Audio non disponible — suis la prononciation écrite');
+  if(!('speechSynthesis' in window)) return toast('🔇 Audio non disponible sur cet appareil — appuie-toi sur la prononciation écrite', 5000);
+  if(!voiceAr) pickVoice();
+  if(voicesReady && !voiceAr && !audioWarned){
+    audioWarned = true;
+    toast('🔇 Aucune voix arabe trouvée sur cet appareil. Ajoute-en une dans les réglages (Accessibilité → Synthèse vocale) — en attendant, suis la prononciation écrite.', 7000);
+  }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(txt);
   u.lang='ar-SA'; u.rate=rate; u.pitch=1;
@@ -224,9 +256,9 @@ const $ = s=>document.querySelector(s);
 const shuffle = a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(v=>v[1]);
 const sample = (a,n)=>shuffle([...a]).slice(0,n);
 const esc = s=>String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function toast(msg){
+function toast(msg, ms=2400){
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._x); t._x = setTimeout(()=>t.classList.remove('show'), 2400);
+  clearTimeout(t._x); t._x = setTimeout(()=>t.classList.remove('show'), ms);
 }
 function confetti(){
   const w = document.createElement('div'); w.className='confetti';
@@ -575,7 +607,7 @@ function renderHome(){
   $('#home-greet').textContent = passed===0 ? 'Bienvenue'+who+' !' :
     passed<4 ? 'Beau départ'+who+' !' : passed<8 ? 'Tu avances fort'+who+' !' :
     passed<10 ? 'Presque au sommet'+who+' !' : 'Diplômé(e)'+who+' ! 🏆';
-  $('#home-sub').textContent = passed===0 ? 'Ton voyage vers la lecture arabe commence ici.' :
+  $('#home-sub').textContent = passed===0 ? 'Tu as lu le livret ? Entraîne-toi ici, étape par étape.' :
     passed<10 ? 'Prochaine étape : '+MODULES[P.mods.findIndex((m,i)=>isUnlocked(i)&&!m.passed)].titre.toLowerCase()+'.' :
     'Tu sais lire, écrire et parler tes premiers mots d\'arabe.';
 
@@ -631,11 +663,12 @@ function renderReviewView(){
 }
 
 /* navigation basse */
-document.querySelectorAll('.bottomnav button').forEach(b=>b.addEventListener('click', ()=>{
-  document.querySelectorAll('.bottomnav button').forEach(x=>x.classList.toggle('active', x===b));
-  ['home','book','review','progress'].forEach(v=>$('#view-'+v).classList.toggle('active', v===b.dataset.nav));
+function gotoView(v){
+  document.querySelectorAll('.bottomnav button').forEach(x=>x.classList.toggle('active', x.dataset.nav===v));
+  ['home','book','review','progress'].forEach(n=>$('#view-'+n).classList.toggle('active', n===v));
   window.scrollTo({top:0});
-}));
+}
+document.querySelectorAll('.bottomnav button').forEach(b=>b.addEventListener('click', ()=>gotoView(b.dataset.nav)));
 
 /* déverrouillage forcé */
 function renderOptions(){
@@ -652,6 +685,14 @@ function renderOptions(){
 $('#force-btn').addEventListener('click', ()=>{
   P.force = !P.force; save(); renderAll();
   toast(P.force ? '🔓 Toutes les étapes sont déverrouillées !' : '🔒 Parcours progressif réactivé');
+});
+
+/* sauvegarde / restauration */
+$('#export-btn').addEventListener('click', exportProgress);
+$('#import-btn').addEventListener('click', ()=>$('#import-file').click());
+$('#import-file').addEventListener('change', e=>{
+  if(e.target.files[0]) importProgress(e.target.files[0]);
+  e.target.value = '';
 });
 
 /* ============================================================
@@ -770,23 +811,32 @@ function openBook(i){
   document.body.style.overflow='hidden';
   $('#lesson-track').style.width='100%';
   const B = $('#lesson-body');
-  B.innerHTML = `<div class="step">
+  B.innerHTML = `<div class="step ${P.showFr?'':'hide-fr'}">
     <span class="kicker">Livret · Leçon ${i+1}/10</span>
     <h2>${b.titre}</h2>
+    <button class="btn btn-ghost btn-sm" id="book-hide-fr" style="margin:4px 0 6px;">${P.showFr?'🙈 Masquer le français':'👁 Afficher le français'}</button>
     ${b.html()}
     <div style="display:flex;gap:10px;margin-top:22px;">
       ${i>0?`<button class="btn btn-ghost" id="book-prev" style="flex:1;">‹ Leçon ${i}</button>`:''}
-      ${i<BOOK.length-1?`<button class="btn btn-primary" id="book-next" style="flex:1;">Leçon ${i+2} ›</button>`:''}
+      ${i<BOOK.length-1?`<button class="btn btn-primary" id="book-next" style="flex:1;">Leçon ${i+2} ›</button>`
+        :`<button class="btn btn-primary" id="book-to-path" style="flex:1;">🗺️ Vers le parcours ›</button>`}
     </div>
     <button class="btn ${i<BOOK.length-1?'btn-ghost':'btn-primary'} btn-block" id="book-close" style="margin-top:10px;">Fermer le livret</button>
   </div>`;
   bindSpeaks(B);
+  $('#book-hide-fr').addEventListener('click', ()=>{
+    P.showFr = !P.showFr; save();
+    const y = $('#lesson-layer').scrollTop;
+    openBook(i);
+    $('#lesson-layer').scrollTop = y;
+  });
   B.querySelectorAll('[data-reveal]').forEach(btn=>btn.addEventListener('click', ()=>{
     btn.parentElement.querySelector('.tr').classList.toggle('hidden-tr');
   }));
-  const pv = $('#book-prev'), nx = $('#book-next');
+  const pv = $('#book-prev'), nx = $('#book-next'), tp = $('#book-to-path');
   if(pv) pv.addEventListener('click', ()=>openBook(i-1));
   if(nx) nx.addEventListener('click', ()=>openBook(i+1));
+  if(tp) tp.addEventListener('click', ()=>{ closeSession(); gotoView('home'); toast('🗺️ À toi de jouer : étape 1 du parcours !'); });
   $('#book-close').addEventListener('click', closeSession);
   $('#lesson-layer').scrollTop = 0;
 }
@@ -955,8 +1005,8 @@ function ruleStep(B, st){
     <span class="kicker">Découverte</span>
     <h2>${esc(st.title)}</h2>
     <p class="lead">${esc(st.text)}</p>
-    <div class="opts" style="grid-template-columns:repeat(3,1fr);">
-      ${st.ex.map(x=>`<button class="opt mid" data-say="${x[0]}"><span><span class="arabic" style="display:block;font-size:30px;">${x[0]}</span><span style="font-size:11.5px;font-weight:800;color:var(--muted);">${esc(x[1])}</span></span></button>`).join('')}
+    <div class="opts" style="grid-template-columns:repeat(3,1fr);direction:rtl;">
+      ${st.ex.map(x=>`<button class="opt mid" data-say="${x[0]}"><span><span class="arabic" style="display:block;font-size:30px;">${x[0]}</span><span style="font-size:11.5px;font-weight:800;color:var(--muted);direction:ltr;">${esc(x[1])}</span></span></button>`).join('')}
     </div>
     <p class="lead" style="margin-top:12px;font-size:12.5px;">👆 Touche chaque case pour l'écouter.</p>
     ${contBtn()}
@@ -1344,7 +1394,21 @@ function finishSession(){
 function renderAll(){
   renderHUD(); renderHome(); renderBadges(); renderReviewView(); renderBook(); renderOptions();
 }
+
+/* page de bienvenue — uniquement au premier lancement */
+$('#welcome-start').addEventListener('click', ()=>{
+  P.welcomed = true; save();
+  $('#welcome-layer').classList.remove('open');
+  document.body.style.overflow='';
+  gotoView('book');
+  openBook(0);
+  toast('👋 Bienvenue ! Voici la leçon 1 : l\'alphabet complet.');
+});
+
 load();
 applyTheme();
 renderAll();
-if(P.streak>1) setTimeout(()=>toast('🔥 '+P.streak+' jours d\'affilée — bravo !'), 800);
+if(!P.welcomed){
+  $('#welcome-layer').classList.add('open');
+  document.body.style.overflow='hidden';
+} else if(P.streak>1) setTimeout(()=>toast('🔥 '+P.streak+' jours d\'affilée — bravo !'), 800);
