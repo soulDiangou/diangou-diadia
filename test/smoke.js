@@ -37,6 +37,20 @@ ok($('#lesson-layer').classList.contains('open') && $('#lesson-body').textConten
 $('#book-close').click();
 ok(!$('#lesson-layer').classList.contains('open'), 'bienvenue : la leçon 1 se referme sur le sommaire du livret');
 
+/* suivi de lecture du livret */
+ok(JSON.parse(w.localStorage.getItem('diangou-diadia-v1')).bookRead[0] === true, 'livret : leçon 1 marquée lue après fermeture');
+ok($('#book-list .book-card').classList.contains('read'), 'livret : la carte de la leçon 1 porte la coche « lue »');
+ok(w.document.querySelectorAll('#book-list .book-card')[1].classList.contains('next'), 'livret : la leçon 2 est signalée « À lire »');
+ok($('#book-count').textContent.includes('1/10'), 'livret : compteur « 1/10 lues » affiché');
+
+/* bouton Reprendre */
+ok($('#btn-resume').textContent.includes('leçon 2'), 'reprendre : le bouton vise la leçon 2');
+$('#btn-resume').click();
+ok($('#lesson-layer').classList.contains('open') && $('#lesson-body').textContent.includes('écritures'),
+   'reprendre : ouvre bien la leçon 2 (les écritures)');
+$('#book-close').click();
+ok($('#btn-resume').textContent.includes('leçon 3'), 'reprendre : avance à la leçon 3 après lecture');
+
 ok($('#view-book').classList.contains('active'), 'accueil : le Livret est l\'onglet par défaut');
 ok(!$('#view-home').classList.contains('active'), 'accueil : le Parcours n\'est pas affiché en premier');
 ok(w.document.querySelector('.bottomnav button').dataset.nav === 'book', 'nav : Livret en première position');

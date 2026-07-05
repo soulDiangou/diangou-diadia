@@ -287,6 +287,12 @@ html[data-theme="dark"] .btn-amber{color:#2b1a02;}
   border:1px solid var(--acc);color:var(--acc);transition:transform .15s;
 }
 .speak-fab:active{transform:scale(.9);}
+/* l'élément touché pulse tant que l'audio joue */
+.speaking{animation:speakPulse .9s ease-in-out infinite;border-color:var(--acc)!important;}
+@keyframes speakPulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.06);box-shadow:0 0 14px var(--acc);}
+}
 .speak-fab.big{width:76px;height:76px;font-size:30px;margin:8px auto 16px;box-shadow:var(--glow);}
 
 /* formes d'une lettre */
@@ -488,6 +494,15 @@ input.name-input:focus{border-color:var(--acc);box-shadow:var(--glow);}
 }
 .book-card b{display:block;font-size:14px;}
 .book-card span{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
+/* suivi de lecture du livret */
+.book-card.read .no{background:var(--ok-soft);border:1px solid var(--ok);color:var(--ok);}
+.book-card.next{border-color:var(--acc);box-shadow:var(--glow);}
+.book-card .to-read{
+  font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--acc);background:var(--acc-soft);border:1px solid var(--acc);
+  border-radius:99px;padding:4px 9px;white-space:nowrap;
+}
+.section-h .count{margin-left:auto;font-size:12px;font-weight:800;color:var(--ok);}
 /* les grilles de lettres se remplissent de droite à gauche, comme l'écriture arabe */
 .btable{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0;direction:rtl;}
 @media(min-width:560px){.btable{grid-template-columns:repeat(5,1fr);}}

@@ -165,7 +165,7 @@ const DKEY = 'diangou-diadia-v1';
 const DEFAULT_P = {
   stars:0, streak:0, last:null, theme:null, name:'', force:false, showFr:false, welcomed:false,
   mods: Array.from({length:10},()=>({done:[], passed:false, best:0})),
-  rq:[], reviewCount:0, badges:[]
+  rq:[], reviewCount:0, badges:[], bookRead:[]
 };
 let P = JSON.parse(JSON.stringify(DEFAULT_P));
 function save(){ try{ localStorage.setItem(DKEY, JSON.stringify(P)); }catch(e){} }
@@ -244,7 +244,12 @@ function sayable(txt){
   const m = /^([ب-غف-ي])([َ-ِ])$/.exec(String(txt).trim());
   return m ? m[0] + MADD[m[2]] : txt;
 }
-function speak(txt, rate=0.72){
+/* l'élément touché pulse pendant que le son joue : l'audio devient visible */
+let speakEl = null;
+function stopSpeakPulse(){
+  if(speakEl){ speakEl.classList.remove('speaking'); speakEl = null; }
+}
+function speak(txt, rate=0.72, el){
   if(!('speechSynthesis' in window)) return toast('🔇 Audio non disponible sur cet appareil — appuie-toi sur la prononciation écrite', 5000);
   if(!voiceAr) pickVoice();
   if(voicesReady && !voiceAr && !audioWarned){
@@ -252,9 +257,12 @@ function speak(txt, rate=0.72){
     toast('🔇 Aucune voix arabe trouvée sur cet appareil. Ajoute-en une dans les réglages (Accessibilité → Synthèse vocale) — en attendant, suis la prononciation écrite.', 7000);
   }
   speechSynthesis.cancel();
+  stopSpeakPulse();
+  if(el && el.isConnected){ speakEl = el; el.classList.add('speaking'); }
   const u = new SpeechSynthesisUtterance(sayable(txt));
   u.lang='ar-SA'; u.rate=rate; u.pitch=1;
   if(voiceAr) u.voice = voiceAr;
+  u.onend = u.onerror = stopSpeakPulse;
   speechSynthesis.speak(u);
 }
 
@@ -801,18 +809,36 @@ const BOOK = [
         <button class="btn btn-ghost btn-sm" data-reveal>👁</button>
       </div>`).join('')},
 ];
+function firstUnreadBook(){
+  for(let i=0;i<BOOK.length;i++) if(!P.bookRead[i]) return i;
+  return -1;
+}
+function markBookRead(i){
+  if(!P.bookRead[i]){ P.bookRead[i] = true; save(); }
+}
 function renderBook(){
+  const next = firstUnreadBook();
+  const read = P.bookRead.filter(Boolean).length;
+  $('#book-count').textContent = read ? read+'/10 lues' : '';
+  const resume = $('#btn-resume');
+  resume.textContent = next===0 ? '▶ Commencer — leçon 1' :
+    next>0 ? '▶ Reprendre — leçon '+(next+1) : '🗺️ Continuer l\'entraînement';
   const list = $('#book-list');
-  if(list.dataset.done) return;
-  list.dataset.done = 1;
   list.innerHTML = BOOK.map((b,i)=>`
-    <button class="book-card" data-book="${i}">
-      <div class="no">${b.icon}</div>
+    <button class="book-card ${P.bookRead[i]?'read':''} ${i===next?'next':''}" data-book="${i}">
+      <div class="no">${P.bookRead[i]?'✓':b.icon}</div>
       <div style="flex:1;min-width:0;"><b>${b.titre}</b><span>${b.sub}</span></div>
-      <div style="font-size:18px;color:var(--muted);">›</div>
+      <div style="font-size:18px;color:var(--muted);">${i===next?'<span class="to-read">À lire</span>':'›'}</div>
     </button>`).join('');
   list.querySelectorAll('.book-card').forEach(c=>c.addEventListener('click', ()=>openBook(+c.dataset.book)));
 }
+$('#btn-resume').addEventListener('click', ()=>{
+  const next = firstUnreadBook();
+  if(next>=0) return openBook(next);
+  const m = P.mods.findIndex((x,j)=>isUnlocked(j)&&!x.passed);
+  if(m===-1) return toast('🏆 Tout est terminé — révise ou rejoue librement !');
+  gotoView('home'); startModule(m);
+});
 function openBook(i){
   const b = BOOK[i];
   S = null;
@@ -844,9 +870,9 @@ function openBook(i){
   }));
   const pv = $('#book-prev'), nx = $('#book-next'), tp = $('#book-to-path');
   if(pv) pv.addEventListener('click', ()=>openBook(i-1));
-  if(nx) nx.addEventListener('click', ()=>openBook(i+1));
-  if(tp) tp.addEventListener('click', ()=>{ closeSession(); gotoView('home'); toast('🗺️ À toi de jouer : étape 1 du parcours !'); });
-  $('#book-close').addEventListener('click', closeSession);
+  if(nx) nx.addEventListener('click', ()=>{ markBookRead(i); openBook(i+1); });
+  if(tp) tp.addEventListener('click', ()=>{ markBookRead(i); closeSession(); gotoView('home'); toast('🗺️ À toi de jouer : étape 1 du parcours !'); });
+  $('#book-close').addEventListener('click', ()=>{ markBookRead(i); closeSession(); });
   $('#lesson-layer').scrollTop = 0;
 }
 $('#btn-review-short').addEventListener('click', ()=>startReview());
@@ -937,6 +963,7 @@ function startSession(steps, mode){
 function closeSession(){
   S = null;
   if('speechSynthesis' in window) speechSynthesis.cancel();
+  stopSpeakPulse();
   $('#lesson-layer').classList.remove('open');
   document.body.style.overflow='';
   renderAll();
@@ -966,7 +993,7 @@ function contBtn(label='Continuer →'){
 }
 function bindCont(B){ B.querySelector('[data-next]').addEventListener('click', next); }
 function bindSpeaks(B){
-  B.querySelectorAll('[data-say]').forEach(el=>el.addEventListener('click', ()=>speak(el.dataset.say)));
+  B.querySelectorAll('[data-say]').forEach(el=>el.addEventListener('click', ()=>speak(el.dataset.say, 0.72, el)));
 }
 function goalStep(B, st){
   B.innerHTML = `<div class="step" style="display:flex;flex-direction:column;flex:1;">
