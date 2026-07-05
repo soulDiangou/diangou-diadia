@@ -235,6 +235,15 @@ function pickVoice(){
   voiceAr = vs.find(v=>/^ar/i.test(v.lang)) || null;
 }
 if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+/* une syllabe isolée (lettre + voyelle courte) est mal lue par la synthèse
+   vocale (elle dit le nom de la lettre ou l'écorche) : on allonge le son
+   avec sa lettre de prolongation (شَ → شَا, بِ → بِي, تُ → تُو).
+   L'affichage ne change pas, seul le texte prononcé est adapté. */
+const MADD = {'َ':'ا', 'ُ':'و', 'ِ':'ي'};
+function sayable(txt){
+  const m = /^([ب-غف-ي])([َ-ِ])$/.exec(String(txt).trim());
+  return m ? m[0] + MADD[m[2]] : txt;
+}
 function speak(txt, rate=0.72){
   if(!('speechSynthesis' in window)) return toast('🔇 Audio non disponible sur cet appareil — appuie-toi sur la prononciation écrite', 5000);
   if(!voiceAr) pickVoice();
@@ -243,7 +252,7 @@ function speak(txt, rate=0.72){
     toast('🔇 Aucune voix arabe trouvée sur cet appareil. Ajoute-en une dans les réglages (Accessibilité → Synthèse vocale) — en attendant, suis la prononciation écrite.', 7000);
   }
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(txt);
+  const u = new SpeechSynthesisUtterance(sayable(txt));
   u.lang='ar-SA'; u.rate=rate; u.pitch=1;
   if(voiceAr) u.voice = voiceAr;
   speechSynthesis.speak(u);
