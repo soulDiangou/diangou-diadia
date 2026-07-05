@@ -55,14 +55,27 @@
   <section class="view active" id="view-book">
     <div class="hero">
       <span class="tag">Commence ici</span>
-      <h1>Le cours — 10 leçons 📖</h1>
+      <h1>Le cours — 11 leçons 📖</h1>
       <p>Tout le cours en un seul endroit : l'alphabet complet, les écritures, les voyelles, les allongements... Lis les leçons dans l'ordre en touchant les lettres et les mots pour les écouter, puis va t'entraîner dans le <b>Parcours</b>.</p>
       <div class="cta-row">
         <button class="btn btn-primary" id="btn-resume">▶ Commencer — leçon 1</button>
       </div>
     </div>
-    <div class="section-h"><span class="tick"></span><h2>Les 10 leçons</h2><span class="count" id="book-count"></span></div>
+    <div class="section-h"><span class="tick"></span><h2>Les leçons</h2><span class="count" id="book-count"></span></div>
     <div id="book-list"></div>
+    <div class="footer-credit">Created by <b>@S.B</b> from T.</div>
+  </section>
+
+  <!-- ===== LECTURE (sourates mot à mot) ===== -->
+  <section class="view" id="view-read">
+    <div class="hero">
+      <span class="tag">L'objectif final</span>
+      <h1>Mes premières sourates 📜</h1>
+      <p>Cinq sourates courtes, de la plus simple à la plus longue. Touche chaque mot pour l'écouter, lis-le à voix haute, puis évalue ta lecture verset par verset. Avant de commencer, lis la leçon 11 du livret : <b>les signes particuliers du Coran</b>.</p>
+      <p style="margin-top:8px;font-size:12px;color:var(--muted);">💡 La voix de synthèse t'aide à déchiffrer les mots — pour apprendre la belle récitation, écoute aussi un récitateur.</p>
+    </div>
+    <div class="section-h"><span class="tick"></span><h2>Les 5 sourates</h2><span class="count" id="read-count"></span></div>
+    <div id="sourate-list"></div>
     <div class="footer-credit">Created by <b>@S.B</b> from T.</div>
   </section>
 
@@ -128,8 +141,9 @@
     <p class="welcome-tag">Apprends à lire l'arabe pas à pas — même en partant de zéro.</p>
     <div class="welcome-free">💚 100 % gratuit · sans publicité · sans inscription</div>
     <div class="welcome-feats">
-      <div class="wf"><span class="i">📖</span><div><b>1 · Le livret, ton cours</b><span>Commence ici : les 10 leçons du livre de référence, de l'alphabet aux premières lectures.</span></div></div>
+      <div class="wf"><span class="i">📖</span><div><b>1 · Le livret, ton cours</b><span>Commence ici : 11 leçons, de l'alphabet aux signes particuliers du Coran.</span></div></div>
       <div class="wf"><span class="i">🗺️</span><div><b>2 · Le parcours, ton entraînement</b><span>Puis entraîne-toi en 10 étapes, avec des quiz, des étoiles et des badges.</span></div></div>
+      <div class="wf"><span class="i">📜</span><div><b>3 · La lecture, ton objectif</b><span>Cinq sourates courtes à lire mot à mot, jusqu'à l'autonomie complète.</span></div></div>
       <div class="wf"><span class="i">🔊</span><div><b>Tout s'écoute</b><span>Touche n'importe quelle lettre ou n'importe quel mot pour entendre sa prononciation.</span></div></div>
       <div class="wf"><span class="i">🔁</span><div><b>Une révision maligne</b><span>Ce que tu rates revient te voir jusqu'à ce que ce soit acquis.</span></div></div>
       <div class="wf"><span class="i">📱</span><div><b>Toujours avec toi</b><span>Fonctionne hors-ligne et s'installe sur ton téléphone comme une appli.</span></div></div>
@@ -144,6 +158,7 @@
   <div class="dock">
     <button data-nav="book" class="active"><span class="i">📖</span>Livret</button>
     <button data-nav="home"><span class="i">🗺️</span>Parcours</button>
+    <button data-nav="read"><span class="i">📜</span>Lecture</button>
     <button data-nav="review"><span class="i">🔁</span>Réviser</button>
     <button data-nav="progress"><span class="i">📊</span>Progrès</button>
   </div>

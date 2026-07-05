@@ -157,6 +157,55 @@ const BADGES = [
  {id:'b6',nom:'Lecteur',e:'📖',test:p=>p.mods[4]&&p.mods[4].passed},
  {id:'b7',nom:'Série de 3 jours',e:'🔥',test:p=>p.streak>=3},
  {id:'b8',nom:'Diplômé',e:'🏆',test:p=>p.mods[9]&&p.mods[9].passed},
+ {id:'b9',nom:'Première sourate',e:'📜',test:p=>SOURATES.some(s=>sourateDone(s,p))},
+ {id:'b10',nom:'Lecteur autonome',e:'🕌',test:p=>SOURATES.every(s=>sourateDone(s,p))},
+];
+function sourateDone(s, p){
+  const lv = (p.sourates||{})[s.id]||[];
+  return s.versets.every((_,k)=>lv[k]===2);
+}
+
+/* ============================================================
+   LECTURE — sourates courtes, mot à mot (objectif : lire en autonomie)
+   ar = mots du verset (ordre arabe), tr = phonétique de chaque mot
+   ============================================================ */
+const BASMALA = {ar:['بِسْمِ','ٱللَّهِ','ٱلرَّحْمَٰنِ','ٱلرَّحِيمِ'], tr:['bismi','llâhi','r-rahmâni','r-rahîm']};
+const SOURATES = [
+ {id:'kawthar', no:108, nom:'Al-Kawthar', fr:'L\'Abondance', basmala:true, versets:[
+   {ar:['إِنَّا','أَعْطَيْنَٰكَ','ٱلْكَوْثَرَ'], tr:['innâ','aʿtaynâka','l-kawthar'], frv:'Nous t\'avons certes accordé l\'Abondance.'},
+   {ar:['فَصَلِّ','لِرَبِّكَ','وَٱنْحَرْ'], tr:['fasalli','li-rabbika','wanhar'], frv:'Accomplis la prière pour ton Seigneur et sacrifie.'},
+   {ar:['إِنَّ','شَانِئَكَ','هُوَ','ٱلْأَبْتَرُ'], tr:['inna','châni\'aka','houwa','l-abtar'], frv:'Celui qui te hait sera, lui, sans postérité.'},
+ ]},
+ {id:'ikhlas', no:112, nom:'Al-Ikhlâs', fr:'Le Monothéisme pur', basmala:true, versets:[
+   {ar:['قُلْ','هُوَ','ٱللَّهُ','أَحَدٌ'], tr:['qoul','houwa','llâhou','ahad'], frv:'Dis : Il est Allah, Unique.'},
+   {ar:['ٱللَّهُ','ٱلصَّمَدُ'], tr:['allâhou','s-samad'], frv:'Allah, Celui dont tout dépend.'},
+   {ar:['لَمْ','يَلِدْ','وَلَمْ','يُولَدْ'], tr:['lam','yalid','wa-lam','yoûlad'], frv:'Il n\'a pas engendré et n\'a pas été engendré.'},
+   {ar:['وَلَمْ','يَكُنْ','لَهُ','كُفُوًا','أَحَدٌ'], tr:['wa-lam','yakoun','lahou','koufouwan','ahad'], frv:'Et nul n\'est égal à Lui.'},
+ ]},
+ {id:'falaq', no:113, nom:'Al-Falaq', fr:'L\'Aube naissante', basmala:true, versets:[
+   {ar:['قُلْ','أَعُوذُ','بِرَبِّ','ٱلْفَلَقِ'], tr:['qoul','aʿoûdhou','bi-rabbi','l-falaq'], frv:'Dis : Je cherche protection auprès du Seigneur de l\'aube.'},
+   {ar:['مِنْ','شَرِّ','مَا','خَلَقَ'], tr:['min','charri','mâ','khalaq'], frv:'Contre le mal de ce qu\'Il a créé.'},
+   {ar:['وَمِنْ','شَرِّ','غَاسِقٍ','إِذَا','وَقَبَ'], tr:['wa-min','charri','ghâsiqin','idhâ','waqab'], frv:'Contre le mal de l\'obscurité quand elle s\'étend.'},
+   {ar:['وَمِنْ','شَرِّ','ٱلنَّفَّاثَاتِ','فِي','ٱلْعُقَدِ'], tr:['wa-min','charri','n-naffâthâti','fî','l-ʿouqad'], frv:'Contre le mal de celles qui soufflent sur les nœuds.'},
+   {ar:['وَمِنْ','شَرِّ','حَاسِدٍ','إِذَا','حَسَدَ'], tr:['wa-min','charri','hâsidin','idhâ','hasad'], frv:'Contre le mal de l\'envieux quand il envie.'},
+ ]},
+ {id:'nas', no:114, nom:'An-Nâs', fr:'Les Hommes', basmala:true, versets:[
+   {ar:['قُلْ','أَعُوذُ','بِرَبِّ','ٱلنَّاسِ'], tr:['qoul','aʿoûdhou','bi-rabbi','n-nâs'], frv:'Dis : Je cherche protection auprès du Seigneur des hommes.'},
+   {ar:['مَلِكِ','ٱلنَّاسِ'], tr:['maliki','n-nâs'], frv:'Le Souverain des hommes.'},
+   {ar:['إِلَٰهِ','ٱلنَّاسِ'], tr:['ilâhi','n-nâs'], frv:'Dieu des hommes.'},
+   {ar:['مِنْ','شَرِّ','ٱلْوَسْوَاسِ','ٱلْخَنَّاسِ'], tr:['min','charri','l-waswâsi','l-khannâs'], frv:'Contre le mal du tentateur qui se dérobe.'},
+   {ar:['ٱلَّذِي','يُوَسْوِسُ','فِي','صُدُورِ','ٱلنَّاسِ'], tr:['alladhî','youwaswisou','fî','soudoûri','n-nâs'], frv:'Qui souffle le mal dans les poitrines des hommes.'},
+   {ar:['مِنَ','ٱلْجِنَّةِ','وَٱلنَّاسِ'], tr:['mina','l-djinnati','wan-nâs'], frv:'Qu\'il soit djinn ou être humain.'},
+ ]},
+ {id:'fatiha', no:1, nom:'Al-Fâtiha', fr:'L\'Ouverture', basmala:false, versets:[
+   {ar:['بِسْمِ','ٱللَّهِ','ٱلرَّحْمَٰنِ','ٱلرَّحِيمِ'], tr:['bismi','llâhi','r-rahmâni','r-rahîm'], frv:'Au nom d\'Allah, le Tout-Miséricordieux, le Très-Miséricordieux.'},
+   {ar:['ٱلْحَمْدُ','لِلَّهِ','رَبِّ','ٱلْعَالَمِينَ'], tr:['al-hamdou','lillâhi','rabbi','l-ʿâlamîn'], frv:'Louange à Allah, Seigneur des mondes.'},
+   {ar:['ٱلرَّحْمَٰنِ','ٱلرَّحِيمِ'], tr:['ar-rahmâni','r-rahîm'], frv:'Le Tout-Miséricordieux, le Très-Miséricordieux.'},
+   {ar:['مَٰلِكِ','يَوْمِ','ٱلدِّينِ'], tr:['mâliki','yawmi','d-dîn'], frv:'Maître du Jour de la rétribution.'},
+   {ar:['إِيَّاكَ','نَعْبُدُ','وَإِيَّاكَ','نَسْتَعِينُ'], tr:['iyyâka','naʿboudou','wa-iyyâka','nastaʿîn'], frv:'C\'est Toi que nous adorons, et c\'est Toi dont nous implorons l\'aide.'},
+   {ar:['ٱهْدِنَا','ٱلصِّرَاطَ','ٱلْمُسْتَقِيمَ'], tr:['ihdinâ','s-sirâta','l-moustaqîm'], frv:'Guide-nous sur le droit chemin.'},
+   {ar:['صِرَاطَ','ٱلَّذِينَ','أَنْعَمْتَ','عَلَيْهِمْ','غَيْرِ','ٱلْمَغْضُوبِ','عَلَيْهِمْ','وَلَا','ٱلضَّالِّينَ'], tr:['sirâta','alladhîna','anʿamta','ʿalayhim','ghayri','l-maghdoûbi','ʿalayhim','wa-lâ','d-dâllîn'], frv:'Le chemin de ceux que Tu as comblés de bienfaits, non de ceux qui ont encouru Ta colère, ni des égarés.'},
+ ]},
 ];
 /* ============================================================
    ÉTAT & PERSISTANCE
@@ -165,7 +214,7 @@ const DKEY = 'diangou-diadia-v1';
 const DEFAULT_P = {
   stars:0, streak:0, last:null, theme:null, name:'', force:false, showFr:false, welcomed:false,
   mods: Array.from({length:10},()=>({done:[], passed:false, best:0})),
-  rq:[], reviewCount:0, badges:[], bookRead:[]
+  rq:[], reviewCount:0, badges:[], bookRead:[], sourates:{}
 };
 let P = JSON.parse(JSON.stringify(DEFAULT_P));
 function save(){ try{ localStorage.setItem(DKEY, JSON.stringify(P)); }catch(e){} }
@@ -682,7 +731,7 @@ function renderReviewView(){
 /* navigation basse */
 function gotoView(v){
   document.querySelectorAll('.bottomnav button').forEach(x=>x.classList.toggle('active', x.dataset.nav===v));
-  ['home','book','review','progress'].forEach(n=>$('#view-'+n).classList.toggle('active', n===v));
+  ['home','book','read','review','progress'].forEach(n=>$('#view-'+n).classList.toggle('active', n===v));
   window.scrollTo({top:0});
 }
 document.querySelectorAll('.bottomnav button').forEach(b=>b.addEventListener('click', ()=>gotoView(b.dataset.nav)));
@@ -808,6 +857,26 @@ const BOOK = [
         <span class="tr hidden-tr">${esc(x[1])}</span>
         <button class="btn btn-ghost btn-sm" data-reveal>👁</button>
       </div>`).join('')},
+ {titre:'Lire le Coran : les signes particuliers', sub:'Alif suscrit, hamza de liaison, arrêts…', icon:'11',
+  html: ()=> bNote('Le Coran est écrit dans une graphie particulière (dite <b>uthmanienne</b>) qui ajoute quelques signes à ce que tu connais déjà. Apprends-les ici, et plus rien ne te surprendra dans la page « Lecture ».')
+    + bH('L\'alif suscrit ـٰ')
+    + bNote('Un <b>petit alif dressé au-dessus</b> de la lettre : il allonge en « â », exactement comme un alif normal. Très fréquent : رَحْمَٰن se lit « rahmân ».')
+    + bCells([['ٱلرَّحْمَٰن','ar-rahmân'],['إِلَٰه','ilâh'],['هَٰذَا','hâdhâ'],['مَٰلِك','mâlik']])
+    + bH('La madda آ')
+    + bNote('Une <b>vague au-dessus du alif</b> : hamza + allongement en un seul signe, on tient bien le « â ». آمَنَ = « âmana ».')
+    + bCells([['آمَنَ','âmana'],['قُرْآن','qour\'ân'],['آيَة','âya']])
+    + bH('La hamza de liaison ٱ')
+    + bNote('Ce alif spécial (ٱ) se prononce en début de phrase, mais <b>disparaît quand on enchaîne</b> depuis le mot précédent : ٱلْحَمْدُ seul = « al-hamdou », mais بِسْمِ ٱللَّهِ = « bismi-llâhi » (le « a » s\'efface).')
+    + bCells([['ٱلْحَمْدُ','al-hamdou'],['ٱلرَّحِيم','ar-rahîm'],['ٱلنَّاس','an-nâs'],['ٱهْدِنَا','ihdinâ']])
+    + bH('La ligature لا')
+    + bNote('Quand ل rencontre ا, elles s\'écrivent <b>en un seul dessin</b> : لا. Tu la reconnaîtras partout.')
+    + bCells([['لَا','lâ'],['وَلَا','wa-lâ'],['فَلَا','fa-lâ'],['إِلَّا','illâ']])
+    + bH('Les lettres écrites mais muettes')
+    + bNote('Un <b>petit rond ovale</b> au-dessus d\'une lettre (souvent le alif final de وا) signale qu\'elle <b>ne se prononce pas</b> : قَالُوا۟ se lit simplement « qâloû ».')
+    + bCells([['قَالُوا۟','qâloû'],['كَانُوا۟','kânoû'],['ءَامَنُوا۟','âmanoû']])
+    + bH('Les signes d\'arrêt')
+    + bNote('De petites lettres posées <b>au-dessus du texte</b> indiquent où respirer : <span class="arabic">ۚ</span> pause permise · <span class="arabic">ۖ</span> mieux vaut continuer · <span class="arabic">ۗ</span> mieux vaut s\'arrêter · <span class="arabic">مـ</span> arrêt obligatoire. Au début, retiens simplement : un petit signe au-dessus = un endroit où l\'on peut souffler.')
+    + bNote('🎯 <b>Tu as maintenant toutes les clés.</b> Direction l\'onglet « Lecture » : cinq sourates courtes t\'attendent, mot à mot.')},
 ];
 function firstUnreadBook(){
   for(let i=0;i<BOOK.length;i++) if(!P.bookRead[i]) return i;
@@ -819,7 +888,7 @@ function markBookRead(i){
 function renderBook(){
   const next = firstUnreadBook();
   const read = P.bookRead.filter(Boolean).length;
-  $('#book-count').textContent = read ? read+'/10 lues' : '';
+  $('#book-count').textContent = read ? read+'/'+BOOK.length+' lues' : '';
   const resume = $('#btn-resume');
   resume.textContent = next===0 ? '▶ Commencer — leçon 1' :
     next>0 ? '▶ Reprendre — leçon '+(next+1) : '🗺️ Continuer l\'entraînement';
@@ -847,7 +916,7 @@ function openBook(i){
   $('#lesson-track').style.width='100%';
   const B = $('#lesson-body');
   B.innerHTML = `<div class="step ${P.showFr?'':'hide-fr'}">
-    <span class="kicker">Livret · Leçon ${i+1}/10</span>
+    <span class="kicker">Livret · Leçon ${i+1}/${BOOK.length}</span>
     <h2>${b.titre}</h2>
     <button class="btn btn-ghost btn-sm" id="book-hide-fr" style="margin:4px 0 6px;">${P.showFr?'🙈 Masquer le français':'👁 Afficher le français'}</button>
     ${b.html()}
@@ -875,6 +944,92 @@ function openBook(i){
   $('#book-close').addEventListener('click', ()=>{ markBookRead(i); closeSession(); });
   $('#lesson-layer').scrollTop = 0;
 }
+/* ============================================================
+   PAGE LECTURE — sourates mot à mot, auto-évaluation par verset
+   ============================================================ */
+function renderSourates(){
+  const list = $('#sourate-list');
+  if(!list) return;
+  let fluent = 0;
+  list.innerHTML = SOURATES.map((s,i)=>{
+    const lv = P.sourates[s.id]||[];
+    const flu = s.versets.filter((_,vi)=>lv[vi]===2).length;
+    const done = flu===s.versets.length;
+    if(done) fluent++;
+    return `<button class="book-card ${done?'read':''}" data-sourate="${i}">
+      <div class="no">${done?'✓':s.no}</div>
+      <div style="flex:1;min-width:0;"><b>${s.nom} — ${s.fr}</b><span>${s.versets.length} versets · ${flu}/${s.versets.length} lus couramment</span></div>
+      <div style="font-size:18px;color:var(--muted);">›</div>
+    </button>`;
+  }).join('');
+  $('#read-count').textContent = fluent ? fluent+'/'+SOURATES.length+' lues' : '';
+  list.querySelectorAll('.book-card').forEach(c=>c.addEventListener('click', ()=>openSourate(+c.dataset.sourate)));
+}
+function openSourate(i){
+  const s = SOURATES[i];
+  S = null;
+  $('#lesson-layer').classList.add('open');
+  document.body.style.overflow='hidden';
+  $('#lesson-track').style.width='100%';
+  const lv = P.sourates[s.id] || (P.sourates[s.id] = []);
+  const chips = (words, trs)=>`<div class="verse-words ${P.showFr?'':'hide-tr'}">${
+    words.map((wd,k)=>`<button class="word-chip" data-say="${wd}"><span class="a arabic">${wd}</span><small>${esc(trs[k])}</small></button>`).join('')
+  }</div>`;
+  const B = $('#lesson-body');
+  B.innerHTML = `<div class="step">
+    <span class="kicker">Lecture · Sourate ${s.no}</span>
+    <h2>${s.nom} — ${s.fr}</h2>
+    <button class="btn btn-ghost btn-sm" id="sourate-tr" style="margin:4px 0 6px;">${P.showFr?'🙈 Masquer la phonétique':'👁 Afficher la phonétique'}</button>
+    <div class="book-note">Touche chaque mot pour l'écouter, puis lis le verset à voix haute et évalue-toi : 😓 j'ai bloqué · 🙂 lu lentement · 🌟 lu couramment. Trois 🌟 partout = sourate maîtrisée !</div>
+    ${s.basmala ? `<div class="basmala">${chips(BASMALA.ar, BASMALA.tr)}</div>` : ''}
+    ${s.versets.map((v,vi)=>`
+      <div class="verse-card">
+        <div class="verse-head">
+          <span class="vno">${vi+1}</span>
+          <button class="speak-fab" style="width:40px;height:40px;font-size:15px;" data-say="${v.ar.join(' ')}">🔊</button>
+        </div>
+        ${chips(v.ar, v.tr)}
+        <div class="verse-fr">${esc(v.frv)}</div>
+        <div class="verse-eval" data-v="${vi}">
+          <span>Ma lecture :</span>
+          <button data-lv="0" class="${lv[vi]===0?'on':''}" title="J'ai bloqué">😓</button>
+          <button data-lv="1" class="${lv[vi]===1?'on':''}" title="Lu lentement">🙂</button>
+          <button data-lv="2" class="${lv[vi]===2?'on':''}" title="Lu couramment">🌟</button>
+        </div>
+      </div>`).join('')}
+    <div style="display:flex;gap:10px;margin-top:22px;">
+      ${i>0?`<button class="btn btn-ghost" id="sourate-prev" style="flex:1;">‹ ${SOURATES[i-1].nom}</button>`:''}
+      ${i<SOURATES.length-1?`<button class="btn btn-primary" id="sourate-next" style="flex:1;">${SOURATES[i+1].nom} ›</button>`:''}
+    </div>
+    <button class="btn btn-ghost btn-block" id="sourate-close" style="margin-top:10px;">Fermer</button>
+  </div>`;
+  bindSpeaks(B);
+  $('#sourate-tr').addEventListener('click', ()=>{
+    P.showFr = !P.showFr; save();
+    const y = $('#lesson-layer').scrollTop;
+    openSourate(i);
+    $('#lesson-layer').scrollTop = y;
+  });
+  B.querySelectorAll('.verse-eval button').forEach(bt=>bt.addEventListener('click', ()=>{
+    const row = bt.parentElement, vi = +row.dataset.v, val = +bt.dataset.lv;
+    const before = lv[vi];
+    lv[vi] = val; save();
+    row.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x===bt));
+    if(val===2 && before!==2){
+      addStars(1);
+      if(s.versets.every((_,k)=>lv[k]===2)){
+        confetti(); checkBadges();
+        toast('🎉 '+s.nom+' lue en entier, couramment — bravo !');
+      }
+    }
+  }));
+  const pv = $('#sourate-prev'), nx = $('#sourate-next');
+  if(pv) pv.addEventListener('click', ()=>openSourate(i-1));
+  if(nx) nx.addEventListener('click', ()=>openSourate(i+1));
+  $('#sourate-close').addEventListener('click', closeSession);
+  $('#lesson-layer').scrollTop = 0;
+}
+
 $('#btn-review-short').addEventListener('click', ()=>startReview());
 $('#btn-review-start').addEventListener('click', ()=>startReview());
 $('#btn-continue').addEventListener('click', ()=>{
@@ -1428,7 +1583,7 @@ function finishSession(){
    INIT
    ============================================================ */
 function renderAll(){
-  renderHUD(); renderHome(); renderBadges(); renderReviewView(); renderBook(); renderOptions();
+  renderHUD(); renderHome(); renderBadges(); renderReviewView(); renderBook(); renderSourates(); renderOptions();
 }
 
 /* page de bienvenue — uniquement au premier lancement */
